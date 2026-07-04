@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#СоздатьСвоеРадио</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>#СоздатьСвоеРадио</h1>
+        <p>Создавайте радиостанции бесплатно по всему миру</p>
+    </header>
+
+    <main>
+        <!-- Форма для бесплатного создания радиостанции -->
+        <section class="create-radio-section">
+            <h2>Создать свою радиостанцию</h2>
+            <div class="form-group">
+                <input type="text" id="stationName" placeholder="Название радиостанции (например, Рок Волна)">
+                <input type="text" id="stationGenre" placeholder="Жанр (например, Rock, Pop, Jazz)">
+                <button onclick="createNewRadio()">Запустить радио</button>
+            </div>
+        </section>
+
+        <!-- Раздел со списком всех существующих радиостанций -->
+        <section class="catalog-section">
+            <h2>Радиостанции Платформы</h2>
+            <div id="radioList" class="radio-grid">
+                <!-- Карточки радиостанций будут добавляться сюда автоматически через JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Подключаем официальную облачную библиотеку Supabase (ОБЯЗАТЕЛЬНО перед app.js) -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Подключаем ваш файл с логикой JavaScript -->
+    <script src="app.js"></script>
+
+</body>
+</html>
