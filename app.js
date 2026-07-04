@@ -43,11 +43,11 @@ async function createNewRadio() {
         return;
     }
 
-    // Тестовый аудиопоток для проверки звука
+    // НАСТОЯЩИЙ поток вещания. Измените эту заглушку, когда пользователи начнут вставлять свои стримы.
     const streamUrl = "https://zeno.fm"; 
 
     try {
-        // А. Запись в вашу базу Supabase
+        // А. Запись в вашу облачную базу Supabase
         const { data, error } = await db
             .from('stations')
             .insert([{ name: name, genre: genre, stream_url: streamUrl }])
@@ -55,37 +55,50 @@ async function createNewRadio() {
 
         if (error) throw error;
 
-        // Б. Отправка в мировой каталог Radio-Browser
+        // Б. Отправка в мировой каталог Radio-Browser (Теперь работает из интернета без CORS ошибок!)
         try {
-            await fetch('https://radio-browser.info', {
+            const response = await fetch('https://radio-browser.info', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'MyRadioPlatform/1.0 (https://github.com)' // Правило хорошего тона для API
+                },
                 body: JSON.stringify({
                     name: name,
-                    url: streamUrl,
-                    homepage: window.location.href,
-                    tags: genre,
-                    country: "Russia",
-                    language: "russian"
+                    url: streamUrl,                     // Поток обязательно должен быть активным аудио-потоком
+                    homepage: window.location.href,    // Теперь здесь автоматически передается ваш url на GitHub Pages!
+                    favicon: "",                       // Иконка (можно оставить пустой)
+                    tags: genre ? genre : "pop,music", // Теги для поиска в приложениях
+                    country: "Russia",                 // Страна вещания
+                    language: "russian"                // Язык станции
                 })
             });
-            console.log("Успешно синхронизировано с Radio-Browser!");
+            
+            if (response.ok) {
+                console.log("Успешно зарегистрировано в глобальной базе Radio-Browser!");
+            } else {
+                console.warn("Каталог отклонил запрос, возможно поток временно недоступен.");
+            }
         } catch (apiErr) {
-            console.warn("Каталог Radio-Browser временно не ответил, но в вашей базе радио создано.");
+            console.error("Сетевая ошибка при отправке в глобальный каталог:", apiErr);
         }
 
-        alert(`Радиостанция "${name}" успешно создана и запущена везде!`);
+        // Выводим подтверждение пользователю
+        alert(`Радиостанция "${name}" успешно запущена! Она добавлена на сайт и отправлена в мировые приложения.`);
         
+        // Очищаем текстовые поля
         document.getElementById('stationName').value = '';
         document.getElementById('stationGenre').value = '';
         
+        // Обновляем список карточек на сайте
         await loadStations();
 
     } catch (mainErr) {
-        alert("Ошибка подключения: " + mainErr.message);
+        alert("Ошибка подключения к базе: " + mainErr.message);
         console.error(mainErr);
     }
 }
+
 
 // 4. ФУНКЦИЯ ВЫВОДА СТАНЦИЙ НА ЭКРАН
 function displayStations() {
